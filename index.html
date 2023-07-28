@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>U-Net Image Segmentation</title>
+</head>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+#upload-form {
+    margin-top: 20px;
+}
+
+#output-container {
+    margin-top: 30px;
+}
+
+#output-image {
+    max-width: 500px;
+    margin-top: 10px;
+}
+
+</style>
+<body>
+    <h1>U-Net Image Segmentation</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="file" id="file-input">
+        <button type="submit">Upload & Process</button>
+    </form>
+    <div id="output-container">
+        <h2>Output</h2>
+        <img id="output-image" src="" alt="Processed Image">
+        <!-- Add a paragraph to display debugging messages -->
+        <p id="debug-message"></p>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('file-input');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+    
+            fetch('/process_image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result) {
+                    // The response contains the base64 encoded image
+                    const imageUrl = 'data:image/jpeg;base64,' + data.result;
+                    document.getElementById('output-image').src = imageUrl;
+                    // Add debugging message to show that the image is received
+                    document.getElementById('debug-message').textContent = 'Image received and displayed successfully.';
+                } else {
+                    // Handle the case where the response does not contain the image data
+                    document.getElementById('debug-message').textContent = 'Error: Image data not received.';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
