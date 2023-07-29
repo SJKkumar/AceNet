@@ -11,7 +11,7 @@ from PIL import Image
 app = Flask(__name__)
 
 # Load the U-Net model
-model_path = 'model.h5'
+github_raw_url = 'https://github.com/SJKkumar/AceNet/raw/main/model.h5'
 def iou(y_true, y_pred):
     def f(y_true, y_pred):
         intersection = (y_true * y_pred).sum()
@@ -32,8 +32,13 @@ def dice_loss(y_true, y_pred):
     return 1.0 - dice_coef(y_true, y_pred)
 
 with CustomObjectScope({'iou': iou, 'dice_coef': dice_coef, 'dice_loss': dice_loss}):
-     model = tf.keras.models.load_model(model_path)
-
+model_response = requests.get(github_raw_url)
+if model_response.status_code == 200:
+    with open('/tmp/model.h5', 'wb') as f:
+        f.write(model_response.content)
+    model = load_model('/tmp/model.h5')
+else:
+    print("Failed to fetch the model.h5 file.")
 def preprocess_input(image):
     # Resize the input image to match the model's input size
     image = cv2.resize(image, (512, 512))
