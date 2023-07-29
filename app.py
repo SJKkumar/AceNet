@@ -11,7 +11,7 @@ from PIL import Image
 app = Flask(__name__)
 
 # Load the U-Net model
-model_path = 'C:/Users/sjkis/OneDrive/Desktop/AceNet/model.h5'
+model_path = 'model.h5'
 def iou(y_true, y_pred):
     def f(y_true, y_pred):
         intersection = (y_true * y_pred).sum()
